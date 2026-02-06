@@ -77,7 +77,7 @@ Remove `rsync-backup-ez`
 sudo rm -fv "/usr/local/bin/rsync-backup-ez"
 ```
 
-Uninstall `rsync-backup-ez` shell completion
+Remove `rsync-backup-ez` shell completion
 
 ```sh
 ## Zsh completion
