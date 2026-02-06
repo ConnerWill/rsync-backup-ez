@@ -6,17 +6,44 @@ set -Eeuo pipefail
 # Globals / Defaults (env overrides supported)
 # -------------------------------------------------------------------
 PROGRAM="${0##*/}"
-VERSION="1.1"
+VERSION="1.0.1"
+DESCRIPTION='Back up your home directory (default) or a list of directories to a
+remote server using rsync over SSH.'
 
-SSH_BIN="/usr/bin/ssh"
-RSYNC_BIN="/usr/bin/rsync"
-DATE_BIN="/usr/bin/date"
-HOSTNAME_BIN="/usr/bin/hostname"
+SSH_BIN="$(command -v ssh)"
+RSYNC_BIN="$(command -v rsync)"
+DATE_BIN="$(command -v date)"
+UNAME_BIN="$(command -v uname)"
 
-LOCAL_HOST="$(${HOSTNAME_BIN} -s)"
+# -------------------------------------------------------------------
+# Hostname detection (Arch-safe)
+# -------------------------------------------------------------------
+get_hostname() {
+	# 1. systemd (preferred on Arch)
+	if command -v hostnamectl >/dev/null 2>&1; then
+		hostnamectl --static 2>/dev/null && return 0
+	fi
+
+	# 2. /etc/hostname (common fallback)
+	if [[ -r /etc/hostname ]]; then
+		tr -d ' \t\n' < /etc/hostname && return 0
+	fi
+
+	# 3. POSIX fallback
+	if [[ -x "${UNAME_BIN}" ]]; then
+		"${UNAME_BIN}" -n && return 0
+	fi
+
+	return 1
+}
+
+LOCAL_HOST="$(get_hostname)" || {
+	echo "ERROR: Unable to determine hostname" >&2
+	exit 1
+}
 
 # ---- Backup target (env > fallback) -------------------------------
-REMOTE_USER="${BACKUP_REMOTE_USER:-backup-host1}"
+REMOTE_USER="${BACKUP_REMOTE_USER:-backup}"
 REMOTE_HOST="${BACKUP_REMOTE_HOST:-backup.example.com}"
 REMOTE_BASE="${BACKUP_REMOTE_BASE:-/backup}"
 
@@ -43,12 +70,11 @@ log_init() {
 }
 
 log() {
-	local level="${1}"
+	local level current_date
+  level="${1}"
 	shift
-	printf "[%s] [%s] %s\n" \
-		"$(${DATE_BIN} '+%Y-%m-%d %H:%M:%S')" \
-		"${level}" \
-		"${*}" | tee -a "${LOG_FILE}"
+  current_date="$(${DATE_BIN} '+%Y-%m-%d %H:%M:%S')"
+	printf "[%s] [%s] %s\n" "${current_date}" "${level}" "${*}" | tee -a "${LOG_FILE}"
 }
 
 log_info()  { log "INFO"  "${@}"; }
@@ -67,43 +93,51 @@ usage() {
 	cat <<EOF
 Usage: ${PROGRAM} [OPTIONS]
 
-Back up your home directory (default) or a list of directories to a
-remote server using rsync over SSH.
+${DESCRIPTION}
 
 Options:
   --dirs DIR [DIR ...]   Backup specific directories instead of '${HOME}'
   --dry-run              Show what would change without writing
   -h, --help             Show this help message
+  -V, --version          Show version
 
 Environment overrides:
-  BACKUP_REMOTE_USER     SSH user (default: backup-host1)
-  BACKUP_REMOTE_HOST     SSH host
-  BACKUP_REMOTE_BASE     Remote base directory (default: /backup)
+  BACKUP_REMOTE_USER     SSH user (default: ${REMOTE_USER})
+  BACKUP_REMOTE_HOST     SSH host (default: ${REMOTE_HOST})
+  BACKUP_REMOTE_BASE     Remote base directory (default: ${REMOTE_BASE})
   BACKUP_SSH_KEY         Path to SSH private key
-  BACKUP_LOG_DIR         Override log directory
+  BACKUP_LOG_DIR         Override log directory (default: ${LOG_DIR})
 
 Examples:
-  backup.sh
-  BACKUP_SSH_KEY=~/.ssh/backup_ed25519 backup.sh
-  backup.sh --dirs /etc /opt /srv
+
+  \$ ${PROGRAM}
+
+  \$ BACKUP_SSH_KEY=~/.ssh/backup_ed25519 ${PROGRAM}
+
+  \$ ${PROGRAM} --dirs /etc /opt /srv
 
 Notes:
+- Arch Linux compatible (no hostname binary required)
 - Designed to run non-interactively (cron-safe)
 - SSH key authentication strongly recommended
-- Logs stored under '\$XDG_STATE_HOME' or '\$HOME/.local/state'
+
 EOF
+}
+
+version() {
+  printf "%s %s\n" "${PROGRAM}" "${VERSION}"
 }
 
 # -------------------------------------------------------------------
 # Argument parsing
 # -------------------------------------------------------------------
 parse_args() {
-	while [[ ${#} -gt 0 ]]; do
-		case "${1}" in
+	while [[ $# -gt 0 ]]; do
+		case "$1" in
 			--dirs)
 				shift
-				while [[ ${#} -gt 0 && "${1}" != --* ]]; do
-					DIRS+=("${1}")
+				while [[ $# -gt 0 && "$1" != --* ]]; do
+					DIRS+=("$1")
 					shift
 				done
 				;;
@@ -113,6 +147,10 @@ parse_args() {
 				;;
 			-h|--help)
 				usage
+				exit 0
+				;;
+			-V|--version)
+			  version
 				exit 0
 				;;
 			*)
