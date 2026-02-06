@@ -8,6 +8,17 @@ _rsync-backup-ez_complete() {
 
     COMPREPLY=()
 
+    # Detect whether --dirs / -d is present anywhere
+    local have_dirs=false
+    for w in "${words[@]}"; do
+        case "${w}" in
+            -d|--dirs)
+                have_dirs=true
+                break
+                ;;
+        esac
+    done
+
     # Complete --long-options
     if [[ ${cur} == --* ]]; then
         COMPREPLY=( $(compgen -W "--dirs --dry-run --help --version" -- "${cur}") )
@@ -20,21 +31,20 @@ _rsync-backup-ez_complete() {
         return
     fi
 
+    # If --dirs / -d was used → complete directories
+    if [[ ${have_dirs} == true ]]; then
+        COMPREPLY=( $(compgen -d -- "${cur}") )
+        return
+    fi
+
     # If we're at position 1 (first word after command) → show options only
     if (( cword == 1 )); then
         local opts="-d --dirs --dry-run -h --help -V --version"
         COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
-        return 0
+        return
     fi
 
-    # After any recognized option → nothing more
-    case "${prev}" in
-        -d|--dirs|--dry-run|-h|--help|-V|--version)
-            return 0
-            ;;
-    esac
-
-    # Fallback: nothing
+    # Otherwise: nothing
     return 0
 }
 
