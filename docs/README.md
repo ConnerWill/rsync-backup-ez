@@ -50,8 +50,6 @@ Install `rsync-backup-ez`
 ```sh
 sudo install -vDm755 "bin/rsync-backup-ez" "/usr/local/bin/rsync-backup-ez"
 ```
-```
-```
 
 Install `rsync-backup-ez` shell completion
 
@@ -77,8 +75,6 @@ Remove `rsync-backup-ez`
 
 ```sh
 sudo rm -fv "/usr/local/bin/rsync-backup-ez"
-```
-```
 ```
 
 Uninstall `rsync-backup-ez` shell completion
