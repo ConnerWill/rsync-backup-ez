@@ -19,3 +19,11 @@ Each host backs up into its own directory, automatically named after the local h
 - `rsync`
 - `ssh`
 - SSH access to the remote backup server
+
+## Installation
+
+```sh
+sudo install -vDm755 ./bin/rsync-backup-ez /usr/local/bin/rsync-backup-ez
+```
+```
+```
