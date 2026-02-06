@@ -34,7 +34,7 @@ success() {
 }
 
 require_script() {
-  [[ -f "${INSTALL_PATH}" ]] || die "Script '${SCRIPT_NAME}' not found in '${INSTALL_PATH}'"
+  [[ -f "${INSTALL_PATH}" ]] || info "Script '${SCRIPT_NAME}' not found in '${INSTALL_PATH}'"
 }
 
 # ---------------------------
