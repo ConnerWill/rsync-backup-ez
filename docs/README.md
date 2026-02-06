@@ -22,8 +22,20 @@ Each host backs up into its own directory, automatically named after the local h
 
 ## Installation
 
+Install `rsync-backup-ez`
+
 ```sh
-sudo install -vDm755 ./bin/rsync-backup-ez /usr/local/bin/rsync-backup-ez
+sudo install -vDm755 "bin/rsync-backup-ez" "/usr/local/bin/rsync-backup-ez"
 ```
 ```
+```
+
+Install `rsync-backup-ez` shell completion
+
+```sh
+## Zsh completion
+sudo install -vDm644 "completion/_rsync-backup-ez" "/usr/share/zsh/site-functions/_rsync-backup-ez"
+
+## Bash completion
+sudo install -vDm644 "completion/rsync-backup-ez_completion.sh" "/usr/share/bash-completion/completions/rsync-backup-ez"
 ```

@@ -1,0 +1,27 @@
+#compdef rsync-backup-ez
+
+_rsync-backup-ez() {
+  local -a opts main_actions
+
+  main_actions=(
+    'Run backup to remote server using rsync'
+    'Backup:Backup specific directories instead of ~/'
+    'Dry Run:Show what would change without writing'
+    'Help:Show help'
+    'Version:Show version'
+  )
+
+  opts=(
+    '(-d --dirs)'{-d,--dirs}'[Backup specific directories instead of ~/]'
+    '(--dry-run)[Show what would change without writing]'
+    '(-h --help)'{-h,--help}'[Show help]'
+    '(-V --version)'{-V,--version}'[Show version]'
+  )
+
+  # No positional arguments anymore → only options or nothing
+  _arguments -C \
+    "${opts[@]}" \
+    '*: :( )'   # explicitly say no more arguments after options
+}
+
+_rsync-backup-ez "${@}"

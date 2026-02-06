@@ -96,10 +96,10 @@ Usage: ${PROGRAM} [OPTIONS]
 ${DESCRIPTION}
 
 Options:
-  --dirs DIR [DIR ...]   Backup specific directories instead of '${HOME}'
-  --dry-run              Show what would change without writing
-  -h, --help             Show this help message
-  -V, --version          Show version
+  -d, --dirs DIR [DIR ...]  Backup specific directories instead of '${HOME}'
+  --dry-run                 Show what would change without writing
+  -h, --help                Show this help message
+  -V, --version             Show version
 
 Environment overrides:
   BACKUP_REMOTE_USER     SSH user (default: ${REMOTE_USER})
@@ -134,7 +134,7 @@ version() {
 parse_args() {
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
-			--dirs)
+			-d|--dirs)
 				shift
 				while [[ $# -gt 0 && "$1" != --* ]]; do
 					DIRS+=("$1")
