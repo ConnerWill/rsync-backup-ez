@@ -50,21 +50,21 @@ main() {
 
   info "Installing '${SCRIPT_NAME}' to '${INSTALL_PATH}'"
 
-  if sudo install -vDm755 "${SCRIPT_NAME}" "${INSTALL_PATH}"; then
-    success "'${SCRIPT_NAME}' installed to '${INSTALL_PATH}'"
+  if sudo install -Dm755 "${SCRIPT_NAME}" "${INSTALL_PATH}"; then
+    success "${SCRIPT_NAME} installed to '${INSTALL_PATH}'"
   else
     die "Unable to install '${SCRIPT_NAME}' to '${INSTALL_PATH}'"
   fi
 
   ## Zsh completion
-  if sudo install -vDm644 "${ZSH_COMPLETION_PATH}" "${ZSH_COMPLETION_DEST_PATH}"; then
+  if sudo install -Dm644 "${ZSH_COMPLETION_PATH}" "${ZSH_COMPLETION_DEST_PATH}"; then
     success "Installed zsh completion to '${ZSH_COMPLETION_DEST_PATH}'"
   else
     die "Unable to install zsh completion to '${ZSH_COMPLETION_DEST_PATH}'"
   fi
 
   ## Bash completion
-  if sudo install -vDm644 "${BASH_COMPLETION_PATH}" "${BASH_COMPLETION_DEST_PATH}"; then
+  if sudo install -Dm644 "${BASH_COMPLETION_PATH}" "${BASH_COMPLETION_DEST_PATH}"; then
     success "Installed bash completion to '${BASH_COMPLETION_DEST_PATH}'"
   else
     die "Unable to install bash completion to '${BASH_COMPLETION_DEST_PATH}'"
