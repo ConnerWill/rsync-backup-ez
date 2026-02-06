@@ -13,15 +13,14 @@ _rsync-backup-ez() {
 
   opts=(
     '(-d --dirs)'{-d,--dirs}'[Backup specific directories instead of ~/]'
-    '(--dry-run)[Show what would change without writing]'
+    '--dry-run[Show what would change without writing]'
     '(-h --help)'{-h,--help}'[Show help]'
     '(-V --version)'{-V,--version}'[Show version]'
   )
 
-  # No positional arguments anymore → only options or nothing
   _arguments -C \
     "${opts[@]}" \
-    '*: :( )'   # explicitly say no more arguments after options
+    '(-d --dirs)*:directory:_files -/'
 }
 
 _rsync-backup-ez "${@}"
